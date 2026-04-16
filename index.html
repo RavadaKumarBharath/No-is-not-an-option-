@@ -15,6 +15,7 @@ body{
   height:100vh;
   margin:0;
   text-align:center;
+  overflow:hidden;
 }
 
 .card{
@@ -31,17 +32,27 @@ button{
   border:none;
   border-radius:30px;
   cursor:pointer;
+  transition:all 0.2s ease;
 }
 
 #yes{
   background:#ff4d6d;
   color:white;
+  position:relative;
+  z-index:1;
 }
 
 #no{
   background:#4361ee;
   color:white;
   position:relative;
+  z-index:2;
+}
+
+#counter{
+  margin-top:10px;
+  font-size:14px;
+  color:#888;
 }
 </style>
 </head>
@@ -54,41 +65,100 @@ button{
 
   <button id="yes">YES 😍</button>
   <button id="no">NO 😒</button>
+
+  <div id="counter"></div>
 </div>
 
+<!-- 🔊 Sounds -->
+<audio id="s1" src="https://www.myinstants.com/media/sounds/boing.mp3"></audio>
+<audio id="s2" src="https://www.myinstants.com/media/sounds/vine-boom.mp3"></audio>
+<audio id="s3" src="https://www.myinstants.com/media/sounds/sad-trombone.mp3"></audio>
+
 <script>
-// ✅ Read from URL
+// 🔗 Params
 function getParam(name){
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
+  return new URLSearchParams(window.location.search).get(name);
 }
 
-// Dynamic values
 const question = getParam("q") || "Will you say YES? 😏";
 const sender   = getParam("s") || "Someone";
 
 document.getElementById("question").innerText = question;
 document.getElementById("sender").innerText = "From: " + sender;
 
-// 😈 NO button runs away
 const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const counter = document.getElementById("counter");
 
-noBtn.addEventListener("mouseover", () => {
-  const x = Math.random() * (window.innerWidth - 100);
-  const y = Math.random() * (window.innerHeight - 50);
+const sounds = [
+  document.getElementById("s1"),
+  document.getElementById("s2"),
+  document.getElementById("s3")
+];
 
+let noClicks = 0;
+let yesScale = 1;
+
+// ❌ NO click
+noBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  noClicks++;
+  counter.innerText = "Attempts: " + noClicks;
+
+  // 🔊 Random sound + increasing volume
+  const snd = sounds[Math.floor(Math.random()*sounds.length)];
+  snd.volume = Math.min(1, 0.2 + noClicks * 0.02);
+  snd.currentTime = 0;
+  snd.play();
+
+  // 📳 Mobile vibration
+  if(navigator.vibrate){
+    navigator.vibrate(80);
+  }
+
+  // Phase 1 (1–5)
+  if(noClicks <= 5){
+    noBtn.style.transform = `scale(${1 - noClicks*0.15})`;
+    return;
+  }
+
+  // Phase 2 (6–50)
+  if(noClicks <= 50){
+    yesScale += 0.08;
+    yesBtn.style.transform = `scale(${yesScale})`;
+    return;
+  }
+
+  // Phase 3 (trap 😈)
+  const rect = yesBtn.getBoundingClientRect();
   noBtn.style.position = "absolute";
-  noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
+  noBtn.style.left = rect.left + "px";
+  noBtn.style.top  = rect.top + "px";
+  noBtn.style.opacity = 0.05;
+
+  noBtn.onclick = sayYes;
 });
 
-// 🎉 YES clicked
-document.getElementById("yes").onclick = () => {
+// 🏃 Hover movement (only phase 2)
+noBtn.addEventListener("mouseover", () => {
+  if(noClicks <= 5 || noClicks > 50) return;
+
+  noBtn.style.position = "absolute";
+  noBtn.style.left = Math.random()*80 + "vw";
+  noBtn.style.top  = Math.random()*80 + "vh";
+});
+
+// 🎉 YES
+function sayYes(){
   document.body.innerHTML = `
-    <h1 style="color:#ff4d6d">😂 I knew it!</h1>
-    <p>You said YES 😈</p>
+    <h1 style="color:#ff4d6d">😂 I KNEW IT!</h1>
+    <p>You can't escape 😈</p>
   `;
-};
+}
+yesBtn.onclick = sayYes;
+
 </script>
 
 </body>
