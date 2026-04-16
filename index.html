@@ -1,5 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Try Saying No 😈</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#ffe6ea;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+  text-align:center;
+  overflow:hidden;
+}
+
+.card{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+button{
+  padding:12px 25px;
+  margin:10px;
+  font-size:18px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  position:relative;
+}
+
+#yes{
+  background:#ff4d6d;
+  color:white;
+  z-index:1;
+}
+
+#no{
+  background:#4361ee;
+  color:white;
+  z-index:2;
+}
+
+#counter{
+  margin-top:10px;
+  font-size:14px;
+  color:#888;
+}
+
+#fake{
+  margin-top:5px;
+  font-size:14px;
+  color:#ff4d6d;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2 id="question">Loading...</h2>
+  <p id="sender"></p>
+
+  <button id="yes">YES 😍</button>
+  <button id="no">NO 😒</button>
+
+  <div id="counter"></div>
+  <div id="fake"></div>
+</div>
+
+<!-- 🔊 Sounds -->
+<audio id="s1" src="https://www.myinstants.com/media/sounds/boing.mp3"></audio>
+<audio id="s2" src="https://www.myinstants.com/media/sounds/vine-boom.mp3"></audio>
+<audio id="s3" src="https://www.myinstants.com/media/sounds/sad-trombone.mp3"></audio>
+
 <script>
-// params
+// 🔗 Params
 function getParam(name){
   return new URLSearchParams(window.location.search).get(name);
 }
@@ -28,7 +109,7 @@ let yesScale = 1;
 let fakeCount = Math.floor(Math.random()*200 + 50);
 fake.innerText = fakeCount + " people failed before you 😂";
 
-// 🔥 MOVE FUNCTION (important fix)
+// 🔥 movement function
 function moveNo(){
   const x = Math.random() * (window.innerWidth - 100);
   const y = Math.random() * (window.innerHeight - 60);
@@ -57,22 +138,22 @@ noBtn.addEventListener("click", (e) => {
     navigator.vibrate(80);
   }
 
-  // ✅ PHASE 1 (1–5)
+  // ✅ Phase 1 (1–5)
   if(noClicks <= 5){
     noBtn.style.transform = `scale(${1 - noClicks*0.15})`;
     return;
   }
 
-  // ✅ PHASE 2 (6–50)
+  // ✅ Phase 2 (6–50)
   if(noClicks <= 50){
-    yesScale += 0.04; // slower smooth growth
+    yesScale += 0.04;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    moveNo(); // 🔥 FIX → move on click
+    moveNo(); // 🔥 important
     return;
   }
 
-  // ✅ PHASE 3 (trap)
+  // ✅ Phase 3 (trap)
   const rect = yesBtn.getBoundingClientRect();
   noBtn.style.position = "absolute";
   noBtn.style.left = rect.left + "px";
@@ -82,7 +163,7 @@ noBtn.addEventListener("click", (e) => {
   noBtn.onclick = sayYes;
 });
 
-// 🔥 ALSO move on hover (desktop bonus)
+// 🔥 hover support (desktop)
 noBtn.addEventListener("mouseover", () => {
   if(noClicks > 5 && noClicks <= 50){
     moveNo();
@@ -100,3 +181,6 @@ function sayYes(){
 yesBtn.onclick = sayYes;
 
 </script>
+
+</body>
+</html>
