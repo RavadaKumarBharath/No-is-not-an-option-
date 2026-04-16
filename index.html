@@ -1,85 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Try Saying No 😈</title>
-
-<style>
-body{
-  font-family: Arial;
-  background:#ffe6ea;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-  text-align:center;
-  overflow:hidden;
-}
-
-.card{
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
-}
-
-button{
-  padding:12px 25px;
-  margin:10px;
-  font-size:18px;
-  border:none;
-  border-radius:30px;
-  cursor:pointer;
-}
-
-#yes{
-  background:#ff4d6d;
-  color:white;
-  position:relative;
-  z-index:1;
-}
-
-#no{
-  background:#4361ee;
-  color:white;
-  position:relative;
-  z-index:2;
-}
-
-#counter{
-  margin-top:10px;
-  font-size:14px;
-  color:#888;
-}
-
-#fake{
-  margin-top:5px;
-  font-size:14px;
-  color:#ff4d6d;
-}
-</style>
-</head>
-
-<body>
-
-<div class="card">
-  <h2 id="question">Loading...</h2>
-  <p id="sender"></p>
-
-  <button id="yes">YES 😍</button>
-  <button id="no">NO 😒</button>
-
-  <div id="counter"></div>
-  <div id="fake"></div>
-</div>
-
-<!-- sounds -->
-<audio id="s1" src="https://www.myinstants.com/media/sounds/boing.mp3"></audio>
-<audio id="s2" src="https://www.myinstants.com/media/sounds/vine-boom.mp3"></audio>
-<audio id="s3" src="https://www.myinstants.com/media/sounds/sad-trombone.mp3"></audio>
-
 <script>
 // params
 function getParam(name){
@@ -106,11 +24,21 @@ const sounds = [
 let noClicks = 0;
 let yesScale = 1;
 
-// fake "people failed"
+// fake counter
 let fakeCount = Math.floor(Math.random()*200 + 50);
 fake.innerText = fakeCount + " people failed before you 😂";
 
-// NO click
+// 🔥 MOVE FUNCTION (important fix)
+function moveNo(){
+  const x = Math.random() * (window.innerWidth - 100);
+  const y = Math.random() * (window.innerHeight - 60);
+
+  noBtn.style.position = "absolute";
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+
+// ❌ NO click
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -118,31 +46,33 @@ noBtn.addEventListener("click", (e) => {
   noClicks++;
   counter.innerText = "Attempts: " + noClicks;
 
-  // sound
+  // 🔊 sound
   const snd = sounds[Math.floor(Math.random()*sounds.length)];
   snd.volume = Math.min(1, 0.2 + noClicks*0.02);
   snd.currentTime = 0;
   snd.play();
 
-  // vibration
+  // 📳 vibration
   if(navigator.vibrate){
     navigator.vibrate(80);
   }
 
-  // PHASE 1 (1–5)
+  // ✅ PHASE 1 (1–5)
   if(noClicks <= 5){
     noBtn.style.transform = `scale(${1 - noClicks*0.15})`;
     return;
   }
 
-  // PHASE 2 (6–50)
+  // ✅ PHASE 2 (6–50)
   if(noClicks <= 50){
-    yesScale += 0.05;
+    yesScale += 0.04; // slower smooth growth
     yesBtn.style.transform = `scale(${yesScale})`;
+
+    moveNo(); // 🔥 FIX → move on click
     return;
   }
 
-  // PHASE 3 (trap)
+  // ✅ PHASE 3 (trap)
   const rect = yesBtn.getBoundingClientRect();
   noBtn.style.position = "absolute";
   noBtn.style.left = rect.left + "px";
@@ -152,16 +82,11 @@ noBtn.addEventListener("click", (e) => {
   noBtn.onclick = sayYes;
 });
 
-// hover move ONLY phase 2
+// 🔥 ALSO move on hover (desktop bonus)
 noBtn.addEventListener("mouseover", () => {
-  if(noClicks <= 5 || noClicks > 50) return;
-
-  const x = Math.random() * (window.innerWidth - 100);
-  const y = Math.random() * (window.innerHeight - 50);
-
-  noBtn.style.position = "absolute";
-  noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
+  if(noClicks > 5 && noClicks <= 50){
+    moveNo();
+  }
 });
 
 // YES
@@ -173,7 +98,5 @@ function sayYes(){
 }
 
 yesBtn.onclick = sayYes;
-</script>
 
-</body>
-</html>
+</script>
